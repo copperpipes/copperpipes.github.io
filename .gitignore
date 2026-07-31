@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+
+# build output (regenerate with `npm run build` / `pnpm build`)
+dist/
+.next/
+
+# vinext / wrangler local state and logs
+.wrangler/
+
+# env files (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# OS / editor junk
+.DS_Store
+.idea/
+.vscode/
