@@ -1,0 +1,55 @@
+# Деплой статики Copper Pipes на GitHub Pages.
+#
+# Этот файл отключён специально: расширение .example, GitHub Actions его
+# не подхватывает. Реальный код сайта — один самодостаточный статический
+# файл public/copper-pipes.html (стили/картинки инлайн, без относительных
+# ссылок на assets/), поэтому воркфлоу не собирает Next.js/vinext/Worker —
+# GitHub Pages не умеет исполнять SSR/Cloudflare Worker, только отдаёт
+# статику. Сборка Next-обёртки здесь не нужна и не имела бы смысла.
+#
+# Когда будешь вливать v2 в main:
+#   1. переименовать файл в pages.yml (убрать .example)
+#   2. в репозитории Settings -> Pages -> Source выбрать "GitHub Actions"
+#      (сейчас там режим "Deploy from a branch")
+#
+name: Deploy Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare static site
+        run: |
+          set -e
+          mkdir -p site
+          cp public/copper-pipes.html site/index.html
+          cp public/copper-pipes-icon.png site/copper-pipes-icon.png
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
